@@ -203,7 +203,7 @@ const PRODUCTS=[
   {id:'m',name:'中階拍',sub:'價位與手感的折衷',price:3750},
   {id:'h',name:'中高階拍',sub:'較彈，店員表示最多人選',price:4350}
 ];
-const S={toast:null,sent:false,step:0,slot:null,picks:['a','b','c'],share:false,consent:false,source:null,coupon:null,tested:{a:false,b:false},running:null,prod:'h',old:false,bought:null,venue:'全部',remind:true,declined:false,own:false};
+const S={rx:'staff',toast:null,sent:false,step:0,slot:null,picks:['a','b','c'],share:false,consent:false,source:null,coupon:null,tested:{a:false,b:false},running:null,prod:'h',old:false,bought:null,venue:'全部',remind:true,declined:false,own:false};
 const $=s=>document.querySelector(s);
 const fmt=n=>'NT$'+n.toLocaleString('en-US');
 const SC={a:[2,3,2],b:[4,4,4]};
@@ -291,10 +291,17 @@ function v2(){
   const sharePart=S.share?`<button class="opt" role="checkbox" aria-checked="${S.consent}" id="consent"><span class="dot"></span><span class="t"><b>我同意用暱稱分享</b><small>不會顯示姓名，可隨時取消</small></span></button>
     ${S.consent?`<div class="share"><div class="tx"><b>${nick()}的處方卡</b><span class="nums" style="font-size:13px">彈性 +${d(0)}｜控球 +${d(1)}｜輕鬆度 +${d(2)}</span><span>朋友掃碼可領 NT$199 體驗券</span></div>${qr()}</div>
     <button class="btn ball" id="lshare">分享給 LINE 好友</button>`:''}`:`<button class="btn ghost" id="share">做成可分享的限動版</button>`;
-  return `<div class="card rx">
-    <div class="head"><b>個人球感處方卡</b><span>NAPA 麗寶店｜測拍處方卡（示意）</span></div>
+  const ai=S.rx==='ai';
+  const AI=[['發球速度','km/h',32.5,36.4,1],['過網高度','cm',34,21,-1],['界內球數','/10',6,8,1],['落點集中度','分',2,4,1]];
+  const aiPart=`${AI.map(m=>`<div class="metric"><div class="name"><span>${m[0]}</span><span><span class="muted">${m[2]}${m[1]} → </span><span class="delta">${m[3]}${m[1]}</span></span></div>
+      <div class="bl"><span style="width:56px">${S.own?'我的拍':'公用拍'}</span><div class="bar a"><i style="width:${Math.min(100,m[2]/(Math.max(m[2],m[3])*1.15)*100)}%"></i></div></div>
+      <div class="bl"><span style="width:56px">NAPA 拍</span><div class="bar b"><i style="width:${Math.min(100,m[3]/(Math.max(m[2],m[3])*1.15)*100)}%"></i></div></div></div>`).join('')}
+      <p class="muted">同一人、固定供球，A/B 交替各打 10 球；過網高度越低越好。數字為示意，第二階段由 AI 匹克球辨識系統實測。</p>`;
+  return `<div class="chips" role="group" aria-label="處方卡版本"><button class="chip" aria-pressed="${!ai}" data-rx="staff">第一階段：店員評分</button><button class="chip" aria-pressed="${ai}" data-rx="ai">第二階段：AI 實測</button></div>
+  <div class="card rx">
+    <div class="head"><b>個人球感處方卡</b><span>NAPA 麗寶店｜${ai?'AI 實測版':'店員評分版'}（示意）</span></div>
     <div class="body">
-      ${MET.map((m,i)=>`<div class="metric"><div class="name"><span>${m[0]}</span><span><span class="muted">${SC.a[i]} → </span><span class="delta">${SC.b[i]}（+${d(i)}）</span></span></div>
+      ${ai?aiPart:''}${ai?'':MET.map((m,i)=>`<div class="metric"><div class="name"><span>${m[0]}</span><span><span class="muted">${SC.a[i]} → </span><span class="delta">${SC.b[i]}（+${d(i)}）</span></span></div>
       <div class="bar b"><i style="width:${SC.b[i]*20}%"></i></div></div>`).join('')}
       <div class="pt"><i style="background:var(--good)"></i><span><b>優點：</b>揮拍節奏穩定，控球不錯。</span></div>
       <div class="pt"><i style="background:var(--warn)"></i><span><b>待改善：</b>偏心擊球時力道不易傳遞。</span></div>
@@ -355,6 +362,7 @@ function bind(){
   document.querySelectorAll('[data-slot]').forEach(b=>b.onclick=()=>{if(S.picks.length){S.slot=b.dataset.slot;render();}});
   const sb=$('#sendbk');if(sb)sb.onclick=sendBooking;
   const ls=$('#lshare');if(ls)ls.onclick=shareRx;
+  document.querySelectorAll('[data-rx]').forEach(b=>b.onclick=()=>{S.rx=b.dataset.rx;render();});
   const sh=$('#share');if(sh)sh.onclick=()=>{S.share=true;render();};
   const cs=$('#consent');if(cs)cs.onclick=()=>{S.consent=!S.consent;render();};
   document.querySelectorAll('[data-own]').forEach(b=>b.onclick=()=>{S.own=b.dataset.own==='1';S.coupon=null;render();});
