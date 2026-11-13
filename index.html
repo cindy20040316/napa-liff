@@ -305,7 +305,7 @@ function v2(){
       <div class="bar b"><i style="width:${SC.b[i]*20}%"></i></div></div>`).join('')}
       <div class="pt"><i style="background:var(--good)"></i><span><b>優點：</b>揮拍節奏穩定，控球不錯。</span></div>
       <div class="pt"><i style="background:var(--warn)"></i><span><b>待改善：</b>偏心擊球時力道不易傳遞。</span></div>
-      <div class="pt"><i style="background:var(--info)"></i><span><b>建議：</b>中高階拍較彈、出力較輕鬆，符合你目前的調性；可再試中階拍比較。</span></div>
+      <div class="pt"><i style="background:var(--info)"></i><span><b>建議：</b>16mm 碳纖維面、中等重量的中高階拍，較彈、出力較輕鬆；拍子不能調磅數，選對規格最重要。</span></div>
       <p class="muted">數據僅供參考，不作為健康或醫療建議；實際效果因人而異。</p>
     </div></div>
     ${sharePart}`;
@@ -348,7 +348,7 @@ function v4(){
       <div class="vb">${v.tel?`<a class="vbtn" href="tel:${v.tel.replace(/-/g,'')}" aria-label="撥打 ${v.tel}">電話</a>`:''}${v.url?`<a class="vbtn pri" href="${v.url}" target="_blank" rel="noopener">${/line\.me|lin\.ee/.test(v.url)?'LINE':'預約'}</a>`:''}<a class="vbtn" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(v.n)}${v.p?'&query_place_id='+v.p:''}" target="_blank" rel="noopener">地圖</a></div></div>`).join('')}</div>
     ${vs.length>4?`<button class="vmore" id="vmore">${S.vall?'收合':`顯示全部 ${vs.length} 處`}</button>`:''}
     <span class="muted" style="font-size:11px">地址電話核對自 Google 地圖與體育署 iplay（2026/11/13），出發前請先確認。</span></div>
-  <div class="card"><b>免費代纏握把布｜30 天退換保證</b><span class="muted">購買後請店員協助，約 3 分鐘；退換條款以百眾公告為準。店內活動：購拍滿一年回收，新拍五折（期限與條件以百眾為準）。</span></div>
+  <div class="card"><b>免費代纏握把布、鉛片配重微調｜30 天退換保證</b><span class="muted">購買後請店員協助，約 3 分鐘；鉛片不貼擊球面，符合比賽規則；退換條款以百眾公告為準。店內活動：購拍滿一年回收，新拍五折（期限與條件以百眾為準）。</span></div>
   <div class="bubble"><small>LINE 訊息預覽（示意）</small>${S.bought?'<span><b>購買後第 7 天｜</b>握把布用了一週，要不要換新？握把布與配件、場地資訊都在這裡。</span>':'<span><b>第 3 天｜</b>你的處方卡重點：中高階拍彈性 +2、出力輕鬆度 +2。體驗券 7 天內仍可折抵 NT$199，剩 4 天。</span>'}</div>
   <button class="opt" role="checkbox" aria-checked="${S.remind}" id="remind"><span class="dot"></span><span class="t"><b>購買後 7 天提醒握把布；活動延續時，滿 11 個月提醒回購</b><small>可以隨時關閉</small></span></button>
   <div><span class="muted">這次流程記錄到的數據</span>
