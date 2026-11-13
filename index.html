@@ -91,8 +91,10 @@ h1{font-size:22px;line-height:1.3;margin:0;font-weight:900;text-wrap:balance}
 .funnel{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;text-align:center;font-size:12px}
 .funnel div{border:1px solid var(--line);border-radius:10px;padding:8px 2px;color:var(--muted);font-size:11.5px;white-space:nowrap}
 .funnel div.y{border-color:var(--good);color:var(--good);font-weight:700}
-.venue{display:flex;justify-content:space-between;gap:8px;font-size:14px;border-bottom:1px solid var(--line);padding:8px 0}
-.venue:last-child{border:0}.venue em{font-style:normal;color:var(--muted);font-size:12px}
+.venue{display:flex;flex-direction:column;gap:6px;font-size:14px;border-bottom:1px solid var(--line);padding:10px 0}
+.venue:last-child{border:0}.venue .vt{display:flex;flex-direction:column}.venue em{font-style:normal;color:var(--muted);font-size:12px}
+.vb{display:flex;flex-wrap:wrap;gap:6px}.vbtn{font-size:12.5px;font-weight:700;text-decoration:none;color:var(--ink);border:1px solid var(--line);border-radius:99px;padding:4px 11px}
+.vbtn.pri{background:var(--court);color:var(--court-ink);border-color:var(--court)}
 .notes{background:var(--surface);border:1px dashed var(--line);border-radius:14px;padding:10px 14px;font-size:13px;display:flex;flex-direction:column;gap:3px}
 .notes b{color:var(--court)}
 .bubble{background:var(--soft);border-radius:14px 14px 14px 4px;padding:10px 12px;font-size:14px;display:flex;flex-direction:column;gap:2px}
@@ -208,7 +210,20 @@ const nameA=()=>S.own?'我的拍子':'初階';
 const PICKS=[['a','示意拍 A','偏彈、好上手'],['b','示意拍 B','偏硬、控球型'],['c','示意拍 C','輕量、網前反應快']];
 const SLOTS=['週六 10:00','週六 14:00','週日 10:00','週日 14:00'];
 const MET=[['彈性','分'],['控球','分'],['出力輕鬆度','分']];
-const VENUES=[['運動中心','示意場地 A（運動中心）','每日開放，需預約'],['民營球館','示意場地 B（民營球館）','計時收費'],['畫線場地','示意場地 C（羽球館畫線）','需自備網架'],['運動中心','示意場地 D（運動中心）','平日夜間開放']];
+const VENUES=[
+  {t:'運動中心',n:'臺中市北區國民運動中心',a:'臺中市北區崇德路一段55號',tel:'04-22356555',url:'',note:'室內｜每面每小時尖峰 NT$350、離峰 NT$280；只收電話或現場預約'},
+  {t:'運動中心',n:'臺中市大里國民暨兒童運動中心',a:'臺中市大里區國光路一段258號',tel:'04-24823900',url:'',note:'室內｜平日離峰每面 NT$280；電話或現場登記'},
+  {t:'運動中心',n:'臺中市朝馬國民運動中心',a:'臺中市西屯區朝貴路199號',tel:'04-22536789',url:'',note:'室內｜曾公告匹克球暫停，請先來電確認'},
+  {t:'運動中心',n:'潭子國民運動中心',a:'臺中市潭子區勝利路140號',tel:'04-25325580',url:'',note:'室內｜週一 09:00–11:00 球敘，電話報名'},
+  {t:'運動中心',n:'臺中市清水國民暨兒童運動中心',a:'臺中市清水區鎮政路358號',tel:'',url:'https://www.qccscservice.com/paper/other_select_index.php?group_id=615&id=2328&title_id=12096',note:'室內｜2026 NAPA 盃比賽場地；7 天內可線上預約'},
+  {t:'民營球館',n:'西雅圖室內匹克球俱樂部',a:'臺中市東區環中東路五段52號',tel:'',url:'https://seattlepickleball.booknow.com.tw/',note:'室內｜每天 06:00–23:00；線上預約'},
+  {t:'民營球館',n:'匹克智治區',a:'臺中市南屯區龍德路一段128號',tel:'',url:'https://gobooking.tw/picklezzz/picklezzz.html',note:'室內｜24 小時；線上預約'},
+  {t:'民營球館',n:'LaLa Dink Pickleball Club',a:'臺中市南屯區文心南三路996巷1號',tel:'',url:'https://tinybot.cc/laladink/bookingcourt/',note:'室內｜10:00–22:00 有人值班；線上預約'},
+  {t:'民營球館',n:'Pickzone 匹克球場 台中朝馬館',a:'臺中市西屯區環中路三段98-2號',tel:'',url:'https://lin.ee/ibxK4Rg',note:'室內｜24 小時；LINE 預約或報名'},
+  {t:'民營球館',n:'優漾複合運動會館 西屯店',a:'臺中市西屯區福科路207號',tel:'04-24623000',url:'',note:'室內｜參考價每人 2 小時 NT$250；需先預約'},
+  {t:'戶外與球敘',n:'大里匹克球場（二二八公園）',a:'臺中市大里區興大南街43號',tel:'0931909838',url:'',note:'戶外｜早場每次 NT$50、晚場 NT$100'},
+  {t:'戶外與球敘',n:'臺中市國際網球中心 匹克球球敘',a:'臺中市北屯區祥順二路224號',tel:'',url:'https://line.me/ti/g/y2HUGPU7Qa',note:'戶外｜週三、五 19:00–21:00，每次 NT$130；LINE 群報名'}
+];
 
 function stepsBar(){
   $('#steps').innerHTML=STEPS.map((s,i)=>{
@@ -315,12 +330,14 @@ function v3(){
   <button class="btn ghost" id="decline">先不買，之後再說</button>`;
 }
 function v4(){
-  const vs=VENUES.filter(v=>S.venue==='全部'||v[0]===S.venue);
+  const vs=VENUES.filter(v=>S.venue==='全部'||v.t===S.venue);
   const f=[['預約',!!S.slot],['領券',!!S.coupon],['測拍',S.tested.a&&S.tested.b],['處方卡',S.tested.b],['成交',!!S.bought]];
   return `<h2>購後服務</h2>
-  <div class="card"><b>大台中場地地圖（共 30 處，下為示意）</b>
-    <div class="chips" role="group" aria-label="場地類型">${['全部','運動中心','民營球館','畫線場地'].map(c=>`<button class="chip" aria-pressed="${S.venue===c}" data-venue="${c}">${c}</button>`).join('')}</div>
-    <div>${vs.map(v=>`<div class="venue"><span>${v[1]}<br><em>${v[2]}</em></span></div>`).join('')}</div></div>
+  <div class="card"><b>台中匹克球場地（真實資料，共 ${VENUES.length} 處）</b>
+    <div class="chips" role="group" aria-label="場地類型">${['全部','運動中心','民營球館','戶外與球敘'].map(c=>`<button class="chip" aria-pressed="${S.venue===c}" data-venue="${c}">${c}</button>`).join('')}</div>
+    <div>${vs.map(v=>`<div class="venue"><div class="vt"><b>${v.n}</b><em>${v.a}</em><em>${v.note}</em></div>
+      <div class="vb">${v.tel?`<a class="vbtn" href="tel:${v.tel.replace(/-/g,'')}">撥打 ${v.tel}</a>`:''}${v.url?`<a class="vbtn pri" href="${v.url}" target="_blank" rel="noopener">${/line\.me|lin\.ee/.test(v.url)?'LINE 報名':'線上預約'}</a>`:''}<a class="vbtn" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(v.a)}" target="_blank" rel="noopener">地圖</a></div></div>`).join('')}</div>
+    <span class="muted" style="font-size:11.5px">資料整理自教育部體育署 iplay 場館資訊、PaddleLab、PicklePi 等公開網頁（查詢日 2026/11/13）。費用與時段可能調整，出發前請先向場館確認。</span></div>
   <div class="card"><b>免費代纏握把布｜30 天退換保證</b><span class="muted">購買後請店員協助，約 3 分鐘；退換條款以百眾公告為準。店內活動：購拍滿一年回收，新拍五折（期限與條件以百眾為準）。</span></div>
   <div class="bubble"><small>LINE 訊息預覽（示意）</small>${S.bought?'<span><b>購買後第 7 天｜</b>握把布用了一週，要不要換新？握把布與配件、場地資訊都在這裡。</span>':'<span><b>第 3 天｜</b>你的處方卡重點：中高階拍彈性 +2、出力輕鬆度 +2。體驗券 7 天內仍可折抵 NT$199，剩 4 天。</span>'}</div>
   <button class="opt" role="checkbox" aria-checked="${S.remind}" id="remind"><span class="dot"></span><span class="t"><b>購買後 7 天提醒握把布；活動延續時，滿 11 個月提醒回購</b><small>可以隨時關閉</small></span></button>
