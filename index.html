@@ -1,0 +1,372 @@
+<!-- test -->
+line2<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>NAPA 麗寶店測拍導購原型</title>
+<script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Barlow+Condensed:wght@600;700&display=swap">
+<style>
+/* Layout: 手機尺寸的單欄 App，上方步驟列、中間畫面、下方店員/數據備註與導覽。
+   Palette: court 球場綠、ball 螢光黃（只用在重點）、偏綠的中性色。 */
+:root{
+  --bg:#eef2ec; --surface:#ffffff; --ink:#1b2a21; --muted:#5d6f63; --line:#d5ddd3;
+  --court:#1f5a3a; --court-ink:#f3f8f1; --ball:#d8e84a; --ball-ink:#2a3300;
+  --soft:#e3ece0; --grey-bar:#a9b3ab; --good:#2f7d4f; --warn:#b8641a; --info:#1f5f9e;
+  --f-body:'Noto Sans TC','PingFang TC','Microsoft JhengHei',sans-serif;
+  --f-num:'Barlow Condensed','Noto Sans TC',sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#101a14; --surface:#18251d; --ink:#e8f0e6; --muted:#9db0a2; --line:#2a3a30;
+  --court:#2f7d4f; --court-ink:#f3f8f1; --ball:#d8e84a; --ball-ink:#2a3300;
+  --soft:#213228; --grey-bar:#5d6c62; --good:#6fcf97; --warn:#e8a15a; --info:#7db7ee; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#101a14; --surface:#18251d; --ink:#e8f0e6; --muted:#9db0a2; --line:#2a3a30;
+  --court:#2f7d4f; --court-ink:#f3f8f1; --ball:#d8e84a; --ball-ink:#2a3300;
+  --soft:#213228; --grey-bar:#5d6c62; --good:#6fcf97; --warn:#e8a15a; --info:#7db7ee; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);line-height:1.6;
+  padding-block:20px 32px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:430px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+header{display:flex;flex-direction:column;gap:6px}
+.tag{align-self:flex-start;background:var(--ball);color:var(--ball-ink);font-size:12px;font-weight:700;letter-spacing:.08em;padding:2px 10px;border-radius:99px}
+h1{font-size:22px;line-height:1.3;margin:0;font-weight:900;text-wrap:balance}
+.sub{color:var(--muted);font-size:13px;margin:0}
+.steps{display:grid;grid-template-columns:repeat(6,1fr);gap:5px}
+.steps button{font:inherit;border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:10px;padding:7px 2px;font-size:11.5px;font-weight:500;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:1px;min-width:0;white-space:nowrap}
+.steps button b{font-family:var(--f-num);font-size:16px;line-height:1;color:var(--muted)}
+.steps button.on{background:var(--court);color:var(--court-ink);border-color:var(--court)}
+.steps button.on b{color:var(--ball)}
+.steps button.done:not(.on){border-color:var(--good);color:var(--good)}
+.steps button.done:not(.on) b{color:var(--good)}
+.steps button:focus-visible,.btn:focus-visible,.opt:focus-visible,.chip:focus-visible{outline:3px solid var(--info);outline-offset:2px}
+.screen{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:20px 18px;min-height:470px;display:flex;flex-direction:column;gap:14px}
+.screen h2{font-size:19px;margin:0;font-weight:900;line-height:1.3}
+.screen p{margin:0}
+.muted{color:var(--muted);font-size:13px}
+.ticket{background:var(--court);color:var(--court-ink);border-radius:16px;padding:16px;position:relative;display:flex;flex-direction:column;gap:4px}
+.ticket .amt{font-family:var(--f-num);font-size:44px;font-weight:700;line-height:1;color:var(--ball)}
+.ticket .amt small{font-family:var(--f-body);font-size:13px;color:var(--court-ink);font-weight:500;margin-left:6px}
+.ticket .code{margin-top:8px;font-family:var(--f-num);font-size:22px;letter-spacing:.14em;border-top:1px dashed rgba(243,248,241,.5);padding-top:8px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:inherit;font-size:13px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:99px;padding:5px 12px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--soft);border-color:var(--court);font-weight:700}
+.btn{font:inherit;font-weight:700;border:0;border-radius:12px;padding:12px 16px;background:var(--court);color:var(--court-ink);cursor:pointer;font-size:15px}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn.ball{background:var(--ball);color:var(--ball-ink)}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.row{display:flex;gap:10px}.row>*{flex:1;min-width:0}
+.metric{display:flex;flex-direction:column;gap:5px}
+.metric .name{display:flex;justify-content:space-between;font-size:14px;font-weight:700}
+.bar{height:12px;background:var(--soft);border-radius:6px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;border-radius:6px;transition:width .9s ease}
+.bar.a i{background:var(--grey-bar)}.bar.b i{background:var(--good)}
+.bl{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
+.bl .bar{flex:1}.bl span:last-child{font-family:var(--f-num);font-size:17px;color:var(--ink);min-width:34px;text-align:right}
+.delta{font-family:var(--f-num);color:var(--good);font-size:17px}
+.card{border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.card.rx{border:2px solid var(--court);padding:0;overflow:hidden}
+.rx .head{background:var(--court);color:var(--court-ink);padding:12px 14px}
+.rx .head b{font-size:18px;display:block}.rx .head span{font-size:12px;opacity:.9}
+.rx .body{padding:12px 14px;display:flex;flex-direction:column;gap:12px}
+.pt{display:flex;gap:10px;align-items:flex-start;font-size:14px}
+.pt i{flex:none;width:10px;height:10px;border-radius:50%;margin-top:7px}
+.pt b{font-weight:700}
+.opt{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:12px;padding:10px 12px;cursor:pointer;background:var(--surface);font:inherit;text-align:left;color:var(--ink);width:100%}
+.opt[aria-checked="true"]{border-color:var(--court);background:var(--soft)}
+.opt .dot{flex:none;width:18px;height:18px;border:2px solid var(--muted);border-radius:50%;margin-top:3px;display:grid;place-items:center}
+.opt[role="checkbox"] .dot{border-radius:5px}
+.opt[aria-checked="true"] .dot{border-color:var(--court);background:var(--court)}
+.opt[aria-checked="true"] .dot::after{content:"";width:6px;height:6px;border-radius:50%;background:var(--ball)}
+.opt[role="checkbox"][aria-checked="true"] .dot::after{border-radius:1px}
+.opt .t{display:flex;flex-direction:column;flex:1;min-width:0}
+.opt .t small{color:var(--muted);font-size:12px}
+.opt .p{font-family:var(--f-num);font-size:19px;white-space:nowrap}
+.sum{display:flex;flex-direction:column;gap:4px;font-size:14px}
+.sum div{display:flex;justify-content:space-between}
+.sum .neg{color:var(--good)}
+.sum .tot{border-top:1px solid var(--line);padding-top:6px;margin-top:2px;font-weight:900;font-size:17px}
+.sum .tot span:last-child{font-family:var(--f-num);font-size:26px}
+.ok{background:var(--soft);border-radius:12px;padding:10px 12px;font-size:14px}
+.funnel{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;text-align:center;font-size:12px}
+.funnel div{border:1px solid var(--line);border-radius:10px;padding:8px 2px;color:var(--muted);font-size:11.5px;white-space:nowrap}
+.funnel div.y{border-color:var(--good);color:var(--good);font-weight:700}
+.venue{display:flex;justify-content:space-between;gap:8px;font-size:14px;border-bottom:1px solid var(--line);padding:8px 0}
+.venue:last-child{border:0}.venue em{font-style:normal;color:var(--muted);font-size:12px}
+.notes{background:var(--surface);border:1px dashed var(--line);border-radius:14px;padding:10px 14px;font-size:13px;display:flex;flex-direction:column;gap:3px}
+.notes b{color:var(--court)}
+.bubble{background:var(--soft);border-radius:14px 14px 14px 4px;padding:10px 12px;font-size:14px;display:flex;flex-direction:column;gap:2px}
+.bubble small{color:var(--muted);font-size:12px}
+.share{background:var(--court);color:var(--court-ink);border-radius:16px;padding:14px;display:flex;gap:12px;align-items:center}
+.share .tx{flex:1;display:flex;flex-direction:column;gap:3px;min-width:0}
+.share b{font-size:15px}.share span{font-size:13px}.share .nums{font-family:var(--f-num);font-size:18px;color:var(--ball)}
+.qr{flex:none;width:68px;height:68px;background:#fff;border-radius:6px;display:grid;grid-template-columns:repeat(7,1fr);padding:4px;gap:1px}
+.qr i{background:#111;display:block}.qr i.w{background:#fff}
+.nav{display:flex;gap:10px}.nav .btn{flex:1}
+.foot{font-size:12px;color:var(--muted)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .notes b{color:var(--ball)}}
+:root[data-theme="dark"] .notes b{color:var(--ball)}
+@media (prefers-reduced-motion:reduce){.bar i{transition:none}}
+.lbar{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:7px 10px}
+.lbar i{width:8px;height:8px;border-radius:50%;background:var(--grey-bar);flex:none}.lbar.on i{background:#06c755}
+.lbar button{margin-left:auto;font:inherit;font-size:12px;border:1px solid var(--line);background:none;color:var(--ink);border-radius:8px;padding:3px 8px;cursor:pointer}
+body{margin:0;background:var(--bg)}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <span class="tag">原型示意</span>
+    <h1>NAPA 麗寶店 測拍導購流程</h1>
+    <p class="sub">從預選預約、到店測拍到購後回流，照著顧客的六個步驟操作一遍。測拍評分、場地與優惠皆為示意，不是 NAPA 官方系統。</p>
+  </header>
+  <div class="lbar" id="lbar"><i></i><span>連線 LINE 中…</span></div>
+  <nav class="steps" id="steps" aria-label="步驟"></nav>
+  <main class="screen" id="screen" aria-live="polite"></main>
+  <section class="notes" id="notes"></section>
+  <div class="nav"><button class="btn ghost" id="prev">上一步</button><button class="btn" id="next">下一步</button></div>
+  <p class="foot">拍價為 2026/11/8 麗寶店店員口述（初階約 1,800、中階約 3,750、中高階約 4,350），含稅與促銷待確認；測拍體驗 NT$199（當日購拍全額折抵）、舊拍折抵 NT$300（限量 100 份）為提案假設，須經百眾確認。</p>
+</div>
+
+<script>
+/* ===== LIFF 設定：在 LINE Developers 建立 LIFF app 後，把 LIFF ID 貼在這裡 ===== */
+const LIFF_ID='';            // 例如 '2001234567-AbCdEfGh'
+const SHOP_URL='';           // 選填：體驗券分享出去後，朋友點擊要開的網址（通常就是 LIFF 連結 https://liff.line.me/LIFF_ID）
+/* ============================================================================ */
+const L={ready:false,inClient:false,loggedIn:false,name:null,err:null};
+async function initLiff(){
+  if(!LIFF_ID||typeof liff==='undefined'){L.err=LIFF_ID?'LIFF SDK 載入失敗':'尚未設定 LIFF ID';lbar();return;}
+  try{
+    await liff.init({liffId:LIFF_ID});
+    L.ready=true;L.inClient=liff.isInClient();L.loggedIn=liff.isLoggedIn();
+    if(L.loggedIn){const p=await liff.getProfile();L.name=p.displayName;}
+  }catch(e){L.err='LIFF 初始化失敗：'+(e.message||e);}
+  lbar();render();
+}
+function lbar(){
+  const el=document.getElementById('lbar');if(!el)return;
+  let t,btn='';
+  if(L.ready&&L.name){t=`已連上 LINE｜${esc(L.name)}`;}
+  else if(L.ready){t='尚未登入 LINE';btn='<button id="llogin">用 LINE 登入</button>';}
+  else{t=`預覽模式（${L.err||'連線中'}）：功能可操作，LINE 分享與傳訊息不會真的送出`;}
+  el.className='lbar'+(L.ready&&L.name?' on':'');
+  el.innerHTML=`<i></i><span>${t}</span>${btn}`;
+  const b=document.getElementById('llogin');if(b)b.onclick=()=>liff.login({redirectUri:location.href});
+}
+function esc(x){return String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+const nick=()=>L.name?esc(L.name):'球友小綠';
+function canShare(){return L.ready&&L.loggedIn&&liff.isApiAvailable('shareTargetPicker');}
+function canSend(){return L.ready&&L.inClient;}
+let toastT;function toast(m){S.toast=m;render();clearTimeout(toastT);toastT=setTimeout(()=>{S.toast=null;render();},2600);}
+function shareLink(){return SHOP_URL||(LIFF_ID?`https://liff.line.me/${LIFF_ID}`:location.href);}
+function rxFlex(){
+  const d=i=>SC.b[i]-SC.a[i];
+  return {type:'flex',altText:`${L.name||'球友'}的球感處方卡｜朋友可領 NT$199 測拍體驗券`,contents:{type:'bubble',
+    header:{type:'box',layout:'vertical',backgroundColor:'#1f5a3a',contents:[
+      {type:'text',text:'個人球感處方卡',color:'#d8e84a',weight:'bold',size:'lg'},
+      {type:'text',text:`${L.name||'球友'}｜NAPA 麗寶店（示意）`,color:'#f3f8f1',size:'xs'}]},
+    body:{type:'box',layout:'vertical',spacing:'sm',contents:[
+      ...MET.map((m,i)=>({type:'box',layout:'horizontal',contents:[
+        {type:'text',text:m[0],size:'sm',color:'#5d6f63'},
+        {type:'text',text:`${SC.a[i]} → ${SC.b[i]}（+${d(i)}）`,size:'sm',align:'end',weight:'bold',color:'#1b2a21'}]})),
+      {type:'separator',margin:'md'},
+      {type:'text',text:'朋友點下方按鈕可領 NT$199 進階測拍體驗券，當日購拍全額折抵（示意）',wrap:true,size:'xs',color:'#5d6f63',margin:'md'}]},
+    footer:{type:'box',layout:'vertical',contents:[
+      {type:'button',style:'primary',color:'#1f5a3a',action:{type:'uri',label:'領體驗券、預約測拍',uri:shareLink()}}]}}};
+}
+async function shareRx(){
+  if(!canShare()){toast('預覽模式：在 LINE 裡開啟才會跳出好友清單');return;}
+  try{const r=await liff.shareTargetPicker([rxFlex()]);toast(r?'已分享給好友':'已取消分享');}
+  catch(e){toast('分享失敗：'+(e.message||e));}
+}
+async function sendBooking(){
+  const txt=`【預約測拍】${S.slot}\n預選拍：${S.picks.map(k=>PICKS.find(p=>p[0]===k)[1]).join('、')}\n到店報到後領取 NT$199 進階測拍體驗券（示意）`;
+  if(!canSend()){toast('預覽模式：在 LINE 裡開啟才會把預約傳到聊天室');return;}
+  try{await liff.sendMessages([{type:'text',text:txt}]);S.sent=true;toast('預約已傳到聊天室');}
+  catch(e){toast('傳送失敗：'+(e.message||e));}
+}
+const STEPS=[
+  {n:'預選預約',staff:'核對預約，只讓顧客試預選的 3 支拍，縮短等待。',data:'LINE 預約表單：記錄預約人數與預約到店率。'},
+  {n:'到店領券',staff:'邀請進階測拍，說明 NT$199 可全額折抵。',data:'記錄來源（QR、LINE、Google 地圖、短影音），用於歸因。'},
+  {n:'換拍測拍',staff:'引導手感（初階較硬、中高階較彈），不貶低公用拍，兩次條件相同。',data:'記錄兩次店員評分（1–5 分）與手機錄影；第二階段可接感測或影像分析。'},
+  {n:'處方卡',staff:'解讀卡片，不做健康或療效宣稱。',data:'店員評分帶入處方卡，分享版僅用暱稱並先取得同意。'},
+  {n:'促購結帳',staff:'介紹各價位與舊拍折抵，不預設一定要買。',data:'核銷優惠碼，統計成交筆數與折抵金額，並記錄是否為已決定品牌的直接購買者。'},
+  {n:'購後服務',staff:'提醒耗材與配件回購，現場代纏握把布。',data:'LINE 回購提醒與滿意度 QR 問卷。'}
+];
+const PRODUCTS=[
+  {id:'e',name:'初階拍',sub:'較硬，需要的力量較大',price:1800},
+  {id:'m',name:'中階拍',sub:'價位與手感的折衷',price:3750},
+  {id:'h',name:'中高階拍',sub:'較彈，店員表示最多人選',price:4350}
+];
+const S={toast:null,sent:false,step:0,slot:null,picks:['a','b','c'],share:false,consent:false,source:null,coupon:null,tested:{a:false,b:false},running:null,prod:'h',old:false,bought:null,venue:'全部',remind:true,declined:false,own:false};
+const $=s=>document.querySelector(s);
+const fmt=n=>'NT$'+n.toLocaleString('en-US');
+const SC={a:[2,3,2],b:[4,4,4]};
+const nameA=()=>S.own?'我的拍子':'初階';
+
+const PICKS=[['a','示意拍 A','偏彈、好上手'],['b','示意拍 B','偏硬、控球型'],['c','示意拍 C','輕量、網前反應快']];
+const SLOTS=['週六 10:00','週六 14:00','週日 10:00','週日 14:00'];
+const MET=[['彈性','分'],['控球','分'],['出力輕鬆度','分']];
+const VENUES=[['運動中心','示意場地 A（運動中心）','每日開放，需預約'],['民營球館','示意場地 B（民營球館）','計時收費'],['畫線場地','示意場地 C（羽球館畫線）','需自備網架'],['運動中心','示意場地 D（運動中心）','平日夜間開放']];
+
+function stepsBar(){
+  $('#steps').innerHTML=STEPS.map((s,i)=>{
+    const done=isDone(i);
+    return `<button class="${i===S.step?'on':''} ${done?'done':''}" data-i="${i}" aria-current="${i===S.step}"><b>${i+1}</b>${s.n}</button>`;
+  }).join('');
+  document.querySelectorAll('#steps button').forEach(b=>b.onclick=()=>go(+b.dataset.i));
+}
+function isDone(i){return [!!S.slot,!!S.coupon,S.tested.a&&S.tested.b,S.tested.a&&S.tested.b&&S.step>3,!!S.bought||S.declined,false][i];}
+function maxStep(){return !S.slot?0:!S.coupon?1:!(S.tested.a&&S.tested.b)?2:5;}
+function canNext(){return S.step<5&&S.step<maxStep();}
+function go(i){
+  if(i<0||i>maxStep())return;
+  S.step=i;render();window.scrollTo({top:0,behavior:'smooth'});
+}
+function code(){return 'NP-'+Math.floor(1000+Math.random()*9000);}
+
+function vPre(){
+  const n=S.picks.length;
+  return `<span class="muted">${L.name?nick()+'，這是你的':''}LINE 球感小測驗結果（示意）</span>
+  <h2>你是「穩定控球型」</h2>
+  <p class="muted">依 5 題答案推薦 3 支拍。勾選想試的拍，到店只試這幾支，不用排隊挑。</p>
+  <div style="display:flex;flex-direction:column;gap:8px">${PICKS.map(p=>`<button class="opt" role="checkbox" aria-checked="${S.picks.includes(p[0])}" data-pick="${p[0]}"><span class="dot"></span><span class="t"><b>${p[1]}</b><small>${p[2]}</small></span></button>`).join('')}</div>
+  <span class="muted">選擇到店時段</span>
+  <div class="chips" role="group" aria-label="時段">${SLOTS.map(t=>`<button class="chip" aria-pressed="${S.slot===t}" data-slot="${t}">${t}</button>`).join('')}</div>
+  ${S.slot?`<div class="ok">已預約 ${S.slot}，預選 ${n} 支拍。到店報到後領取 NT$199 進階測拍體驗券。（示意）</div>
+    <button class="btn ghost" id="sendbk">${S.sent?'已傳到 LINE 聊天室 ✓':'把預約傳到 LINE 聊天室'}</button>`:`<p class="muted">${n?'再選一個時段就能預約。':'至少勾選 1 支拍。'}</p>`}`;
+}
+function v0(){
+  const src=['YouTube Shorts','Instagram Reels','Google 地圖','現場 QR','朋友推薦'];
+  return `<span class="muted">你是從哪裡知道這間店的？</span>
+  <div class="chips" role="group" aria-label="來源">${src.map(s=>`<button class="chip" aria-pressed="${S.source===s}" data-src="${s}">${s}</button>`).join('')}</div>
+  <span class="muted">你是哪一種？</span>
+  <div class="chips" role="group" aria-label="身分"><button class="chip" aria-pressed="${!S.own}" data-own="0">第一次體驗</button><button class="chip" aria-pressed="${S.own}" data-own="1">我有拍子，帶拍換試</button></div>
+  ${S.own?'<p class="muted">帶自己的拍子到店，免費換試 NAPA 拍，和你現在用的比一比。</p>':''}
+  <h2>${S.own?'帶拍換試券':'進階測拍體驗券'}</h2>
+  <div class="ticket">
+    <span>${S.own?'用你自己的拍子和 NAPA 中高階拍各測一次，免費換試，拿到個人處方卡':'用初階公用拍和中高階拍各測一次，拿到你的個人處方卡'}</span>
+    <div class="amt">199<small>當日購拍全額折抵</small></div>
+    ${S.coupon?`<div class="code">${S.coupon}</div>`:''}
+  </div>
+  ${S.coupon?`<div class="ok">已領取。把這組代碼給店員，結帳時會自動折抵 NT$199。（示意代碼）</div>`
+    :`<button class="btn ball" id="claim" ${S.source?'':'disabled'}>${S.source?'領取體驗券':'先選擇來源，再領取'}</button>
+      <p class="muted">基礎體驗（約 3 分鐘試打，視現場店員餵球或設備）免費，不需要領券。</p>`}`;
+}
+function v1(){
+  const bar=(k,v,cls)=>`<div class="bl"><span style="width:50px">${k==='a'?nameA():'中高階'}</span><div class="bar ${cls}"><i style="width:${v*20}%"></i></div><span>${v||''}</span></div>`;
+  const run=S.running;
+  const done=S.tested.a&&S.tested.b;
+  return `<h2>${S.own?'你的拍子和中高階拍各測一次':'初階公用拍和中高階拍各測一次'}</h2>
+  <p class="muted">兩次的試打條件相同（店員餵球或設備），店員逐項評分（1–5 分）。</p>
+  <div class="row">
+    <button class="btn ${S.tested.a?'ghost':''}" id="t-a" ${run||S.tested.a?'disabled':''}>${run==='a'?'測拍中…':S.tested.a?nameA()+' ✓':(S.own?'① 我的拍子':'① 初階公用拍')}</button>
+    <button class="btn ${S.tested.b?'ghost':''}" id="t-b" ${run||S.tested.b||!S.tested.a?'disabled':''}>${run==='b'?'測拍中…':S.tested.b?'中高階 ✓':'② 中高階拍'}</button>
+  </div>
+  ${MET.map((m,i)=>`<div class="metric"><div class="name"><span>${m[0]}（${m[1]}）</span>${done?`<span class="delta">+${SC.b[i]-SC.a[i]}</span>`:''}</div>
+    ${bar('a',S.tested.a?SC.a[i]:0,'a')}${bar('b',S.tested.b?SC.b[i]:0,'b')}</div>`).join('')}
+  ${done?'<div class="ok">兩次測拍完成，下一步看你的處方卡。</div>':''}`;
+}
+function qr(){const c=[];for(let i=0;i<49;i++){const x=i%7,y=Math.floor(i/7);const f=(x<3&&y<3)||(x>3&&y<3)||(x<3&&y>3);c.push(`<i class="${(f||((x*3+y*5+x*y)%3===0))?'':'w'}"></i>`);}return `<div class="qr" aria-label="示意 QR">${c.join('')}</div>`;}
+function v2(){
+  const d=i=>SC.b[i]-SC.a[i];
+  const sharePart=S.share?`<button class="opt" role="checkbox" aria-checked="${S.consent}" id="consent"><span class="dot"></span><span class="t"><b>我同意用暱稱分享</b><small>不會顯示姓名，可隨時取消</small></span></button>
+    ${S.consent?`<div class="share"><div class="tx"><b>${nick()}的處方卡</b><span class="nums" style="font-size:13px">彈性 +${d(0)}｜控球 +${d(1)}｜輕鬆度 +${d(2)}</span><span>朋友掃碼可領 NT$199 體驗券</span></div>${qr()}</div>
+    <button class="btn ball" id="lshare">分享給 LINE 好友</button>`:''}`:`<button class="btn ghost" id="share">做成可分享的限動版</button>`;
+  return `<div class="card rx">
+    <div class="head"><b>個人球感處方卡</b><span>NAPA 麗寶店｜測拍處方卡（示意）</span></div>
+    <div class="body">
+      ${MET.map((m,i)=>`<div class="metric"><div class="name"><span>${m[0]}</span><span><span class="muted">${SC.a[i]} → </span><span class="delta">${SC.b[i]}（+${d(i)}）</span></span></div>
+      <div class="bar b"><i style="width:${SC.b[i]*20}%"></i></div></div>`).join('')}
+      <div class="pt"><i style="background:var(--good)"></i><span><b>優點：</b>揮拍節奏穩定，控球不錯。</span></div>
+      <div class="pt"><i style="background:var(--warn)"></i><span><b>待改善：</b>偏心擊球時力道不易傳遞。</span></div>
+      <div class="pt"><i style="background:var(--info)"></i><span><b>建議：</b>中高階拍較彈、出力較輕鬆，符合你目前的調性；可再試中階拍比較。</span></div>
+      <p class="muted">數據僅供參考，不作為健康或醫療建議；實際效果因人而異。</p>
+    </div></div>
+    ${sharePart}`;
+}
+function total(){
+  const p=PRODUCTS.find(x=>x.id===S.prod);
+  const lines=[[p.name,p.price]];
+  lines.push(['體驗券折抵',-199]);
+  if(S.old)lines.push(['舊拍折抵（捐贈）',-300]);
+  const t=lines.reduce((a,l)=>a+l[1],0);
+  return {lines,t,p};
+}
+function v3(){
+  if(S.bought){const b=S.bought;
+    return `<h2>購買完成</h2>
+    <div class="ticket"><span>核銷代碼（示意）</span><div class="code" style="border:0;padding:0;margin:0">${b.code}</div></div>
+    <div class="sum">${b.lines.map(l=>`<div class="${l[1]<0?'neg':''}"><span>${l[0]}</span><span>${l[1]<0?'-':''}${fmt(Math.abs(l[1]))}</span></div>`).join('')}<div class="tot"><span>實付</span><span>${fmt(b.t)}</span></div></div>
+    ${S.old?'<div class="ok">舊拍會集中檢查後，捐給學校或社區球隊使用。</div>':''}
+    <button class="btn ghost" id="redo">重新選擇</button>`;}
+  if(S.declined)return `<h2>先不買也沒問題</h2>
+    <div class="ok">已記錄你的處方卡。7 天內再回店，同一張體驗券仍可折抵 NT$199。（示意）</div>
+    <p class="muted">店家會在 LINE 傳你的處方卡摘要，你可以慢慢比較。</p>
+    <button class="btn ghost" id="redo">回去選商品</button>`;
+  const {lines,t}=total();
+  return `<h2>選一個適合你的方案</h2>
+  <div role="radiogroup" aria-label="商品" style="display:flex;flex-direction:column;gap:8px">
+  ${PRODUCTS.map(p=>`<button class="opt" role="radio" aria-checked="${S.prod===p.id}" data-prod="${p.id}"><span class="dot"></span><span class="t"><b>${p.name}</b><small>${p.sub}</small></span><span class="p">${fmt(p.price)}</span></button>`).join('')}</div>
+  <button class="opt" role="checkbox" aria-checked="${S.old}" id="old"><span class="dot"></span><span class="t"><b>我帶了舊球拍，願意捐贈</b><small>舊拍折抵 NT$300，限量 100 份</small></span><span class="p">-300</span></button>
+  <div class="sum">${lines.map(l=>`<div class="${l[1]<0?'neg':''}"><span>${l[0]}</span><span>${l[1]<0?'-':''}${fmt(Math.abs(l[1]))}</span></div>`).join('')}<div class="tot"><span>應付</span><span>${fmt(t)}</span></div></div>
+  <button class="btn ball" id="buy">確認購買</button>
+  <button class="btn ghost" id="decline">先不買，之後再說</button>`;
+}
+function v4(){
+  const vs=VENUES.filter(v=>S.venue==='全部'||v[0]===S.venue);
+  const f=[['預約',!!S.slot],['領券',!!S.coupon],['測拍',S.tested.a&&S.tested.b],['處方卡',S.tested.b],['成交',!!S.bought]];
+  return `<h2>購後服務</h2>
+  <div class="card"><b>大台中場地地圖（共 30 處，下為示意）</b>
+    <div class="chips" role="group" aria-label="場地類型">${['全部','運動中心','民營球館','畫線場地'].map(c=>`<button class="chip" aria-pressed="${S.venue===c}" data-venue="${c}">${c}</button>`).join('')}</div>
+    <div>${vs.map(v=>`<div class="venue"><span>${v[1]}<br><em>${v[2]}</em></span></div>`).join('')}</div></div>
+  <div class="card"><b>免費代纏握把布｜30 天退換保證</b><span class="muted">購買後請店員協助，約 3 分鐘；退換條款以百眾公告為準。店內活動：購拍滿一年回收，新拍五折（期限與條件以百眾為準）。</span></div>
+  <div class="bubble"><small>LINE 訊息預覽（示意）</small>${S.bought?'<span><b>購買後第 7 天｜</b>握把布用了一週，要不要換新？握把布與配件、場地資訊都在這裡。</span>':'<span><b>第 3 天｜</b>你的處方卡重點：中高階拍彈性 +2、出力輕鬆度 +2。體驗券 7 天內仍可折抵 NT$199，剩 4 天。</span>'}</div>
+  <button class="opt" role="checkbox" aria-checked="${S.remind}" id="remind"><span class="dot"></span><span class="t"><b>購買後 7 天提醒握把布；活動延續時，滿 11 個月提醒回購</b><small>可以隨時關閉</small></span></button>
+  <div><span class="muted">這次流程記錄到的數據</span>
+  <div class="funnel" style="margin-top:6px">${f.map(x=>`<div class="${x[1]?'y':''}">${x[1]?'✓ ':''}${x[0]}</div>`).join('')}</div></div>
+  <button class="btn ghost" id="restart">從頭再操作一次</button>`;
+}
+const VIEWS=[vPre,v0,v1,v2,v3,v4];
+
+function bind(){
+  document.querySelectorAll('[data-pick]').forEach(b=>b.onclick=()=>{const k=b.dataset.pick;S.picks=S.picks.includes(k)?S.picks.filter(x=>x!==k):[...S.picks,k];if(!S.picks.length)S.slot=null;render();});
+  document.querySelectorAll('[data-slot]').forEach(b=>b.onclick=()=>{if(S.picks.length){S.slot=b.dataset.slot;render();}});
+  const sb=$('#sendbk');if(sb)sb.onclick=sendBooking;
+  const ls=$('#lshare');if(ls)ls.onclick=shareRx;
+  const sh=$('#share');if(sh)sh.onclick=()=>{S.share=true;render();};
+  const cs=$('#consent');if(cs)cs.onclick=()=>{S.consent=!S.consent;render();};
+  document.querySelectorAll('[data-own]').forEach(b=>b.onclick=()=>{S.own=b.dataset.own==='1';S.coupon=null;render();});
+  document.querySelectorAll('[data-src]').forEach(b=>b.onclick=()=>{S.source=b.dataset.src;render();});
+  const c=$('#claim');if(c)c.onclick=()=>{S.coupon=code();render();};
+  ['a','b'].forEach(k=>{const b=$('#t-'+k);if(b)b.onclick=()=>{S.running=k;render();setTimeout(()=>{S.running=null;S.tested[k]=true;render();setTimeout(()=>{document.querySelectorAll('.bar.'+k+' i').forEach(()=>{});},0);},1100);};});
+  document.querySelectorAll('[data-prod]').forEach(b=>b.onclick=()=>{S.prod=b.dataset.prod;render();});
+  const o=$('#old');if(o)o.onclick=()=>{S.old=!S.old;render();};
+  const by=$('#buy');if(by)by.onclick=()=>{const t=total();S.bought={code:code(),lines:t.lines,t:t.t};S.declined=false;render();};
+  const dc=$('#decline');if(dc)dc.onclick=()=>{S.declined=true;render();};
+  const rd=$('#redo');if(rd)rd.onclick=()=>{S.bought=null;S.declined=false;render();};
+  document.querySelectorAll('[data-venue]').forEach(b=>b.onclick=()=>{S.venue=b.dataset.venue;render();});
+  const rm=$('#remind');if(rm)rm.onclick=()=>{S.remind=!S.remind;render();};
+  const rs=$('#restart');if(rs)rs.onclick=()=>{Object.assign(S,{step:0,slot:null,picks:['a','b','c'],share:false,consent:false,source:null,coupon:null,tested:{a:false,b:false},running:null,prod:'h',old:false,bought:null,venue:'全部',declined:false,own:false,sent:false});render();};
+}
+function render(){
+  stepsBar();
+  $('#screen').innerHTML=VIEWS[S.step]();
+  const st=STEPS[S.step];
+  $('#notes').innerHTML=`<span><b>店員：</b>${st.staff}</span><span><b>數據：</b>${st.data}</span>`;
+  $('#prev').disabled=S.step===0;
+  $('#next').disabled=!canNext();
+  $('#next').textContent=S.step===5?'已是最後一步':'下一步';
+  let tt=document.getElementById('toast');if(!tt){tt=document.createElement('div');tt.id='toast';tt.setAttribute('role','status');tt.style.cssText='position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#1b2a21;color:#fff;padding:9px 14px;border-radius:10px;font-size:13.5px;max-width:86vw;z-index:9;transition:opacity .2s';document.body.appendChild(tt);}
+  tt.textContent=S.toast||'';tt.style.opacity=S.toast?1:0;
+  bind();
+}
+$('#prev').onclick=()=>go(S.step-1);
+$('#next').onclick=()=>go(S.step+1);
+render();
+initLiff();
+</script>
+</body>
+</html>
