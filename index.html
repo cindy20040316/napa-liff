@@ -91,9 +91,11 @@ h1{font-size:22px;line-height:1.3;margin:0;font-weight:900;text-wrap:balance}
 .funnel{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;text-align:center;font-size:12px}
 .funnel div{border:1px solid var(--line);border-radius:10px;padding:8px 2px;color:var(--muted);font-size:11.5px;white-space:nowrap}
 .funnel div.y{border-color:var(--good);color:var(--good);font-weight:700}
-.venue{display:flex;flex-direction:column;gap:6px;font-size:14px;border-bottom:1px solid var(--line);padding:10px 0}
-.venue:last-child{border:0}.venue .vt{display:flex;flex-direction:column}.venue em{font-style:normal;color:var(--muted);font-size:12px}
-.vb{display:flex;flex-wrap:wrap;gap:6px}.vbtn{font-size:12.5px;font-weight:700;text-decoration:none;color:var(--ink);border:1px solid var(--line);border-radius:99px;padding:4px 11px}
+.venue{display:flex;align-items:center;gap:10px;font-size:13.5px;border-bottom:1px solid var(--line);padding:8px 0}
+.venue:last-child{border:0}.venue .vt{display:flex;flex-direction:column;flex:1;min-width:0;line-height:1.35}
+.venue .vt b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.venue em{font-style:normal;color:var(--muted);font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vb{display:flex;gap:4px;flex:none}.vbtn{font-size:12px;font-weight:700;text-decoration:none;color:var(--ink);border:1px solid var(--line);border-radius:99px;padding:3px 9px}
+.vmore{font:inherit;font-size:13px;font-weight:700;border:1px dashed var(--line);background:none;color:var(--court);border-radius:10px;padding:7px;cursor:pointer}
 .vbtn.pri{background:var(--court);color:var(--court-ink);border-color:var(--court)}
 .notes{background:var(--surface);border:1px dashed var(--line);border-radius:14px;padding:10px 14px;font-size:13px;display:flex;flex-direction:column;gap:3px}
 .notes b{color:var(--court)}
@@ -212,7 +214,7 @@ const SLOTS=['週六 10:00','週六 14:00','週日 10:00','週日 14:00'];
 const MET=[['彈性','分'],['控球','分'],['出力輕鬆度','分']];
 const VENUES=[
   {t:'運動中心',n:'臺中市北區國民運動中心',p:'ChIJi1BkR2Q9aTQR3cRtvtaXLU0',a:'臺中市北區崇德路一段55號',tel:'04-22356555',url:'',note:'室內｜每面每小時尖峰 NT$350、離峰 NT$280；只收電話或現場預約'},
-  {t:'運動中心',n:'臺中市大里國民暨兒童運動中心',a:'臺中市大里區國光路一段258號',tel:'04-24823900',url:'',note:'室內｜平日離峰每面 NT$280；電話或現場登記'},
+  {t:'運動中心',n:'臺中市大里國民暨兒童運動中心',p:'ChIJxzQDPV09aTQRrGbhm5VsCYs',a:'臺中市大里區國光路一段258號',tel:'04-24823900',url:'',note:'室內｜平日離峰每面 NT$280；電話或現場登記'},
   {t:'運動中心',n:'臺中市朝馬國民運動中心',p:'ChIJhyeMz_A9aTQRmQHasv75LHE',a:'臺中市西屯區朝貴路199號',tel:'04-22536789',url:'',note:'室內｜曾公告匹克球暫停，請先來電確認'},
   {t:'運動中心',n:'潭子國民運動中心',p:'ChIJIR36CeEXaTQRQ5JvdXWJhUw',a:'臺中市潭子區勝利路140號',tel:'04-25325580',url:'',note:'室內｜週一 09:00–11:00 球敘，電話報名'},
   {t:'運動中心',n:'臺中市清水國民暨兒童運動中心',p:'ChIJge0aZwAVaTQRsXuHOP9mGbQ',a:'臺中市清水區鎮政路358號',tel:'04-26266511',url:'https://www.qccscservice.com/paper/other_select_index.php?group_id=615&id=2328&title_id=12096',note:'室內｜2026 NAPA 盃比賽場地；7 天內可線上預約'},
@@ -222,7 +224,7 @@ const VENUES=[
   {t:'民營球館',n:'Pickzone 匹克球場 台中朝馬館',p:'ChIJY4zv6qs9aTQR5CSLWPSAjDY',a:'臺中市西屯區環中路三段98-2A號',tel:'0918-807886',url:'https://lin.ee/ibxK4Rg',note:'室內｜24 小時；LINE 預約或報名'},
   {t:'民營球館',n:'優漾複合運動會館 西屯店',p:'ChIJey8-vgYWaTQR2RpNJLMO_oo',a:'臺中市西屯區福科路207號',tel:'04-24623000',url:'',note:'室內｜參考價每人 2 小時 NT$250；需先預約'},
   {t:'戶外與球敘',n:'大里康橋匹克球場（二二八公園旁）',p:'ChIJS3tSRAA9aTQRTeEwMbs2_Ng',a:'臺中市大里區興大南街43號',tel:'0931909838',url:'',note:'戶外｜早場每次 NT$50、晚場 NT$100'},
-  {t:'戶外與球敘',n:'臺中市國際網球中心 匹克球球敘',a:'臺中市北屯區祥順二路224號',tel:'',url:'https://line.me/ti/g/y2HUGPU7Qa',note:'戶外｜週三、五 19:00–21:00，每次 NT$130；LINE 群報名'}
+  {t:'戶外與球敘',n:'臺中市國際網球中心 匹克球球敘',p:'ChIJs31fLBIYaTQRfmNxQ4nvKyM',a:'臺中市北屯區祥順二路224號',tel:'',url:'https://line.me/ti/g/y2HUGPU7Qa',note:'戶外｜週三、五 19:00–21:00，每次 NT$130；LINE 群報名'}
 ];
 
 function stepsBar(){
@@ -333,11 +335,12 @@ function v4(){
   const vs=VENUES.filter(v=>S.venue==='全部'||v.t===S.venue);
   const f=[['預約',!!S.slot],['領券',!!S.coupon],['測拍',S.tested.a&&S.tested.b],['處方卡',S.tested.b],['成交',!!S.bought]];
   return `<h2>購後服務</h2>
-  <div class="card"><b>台中匹克球場地（真實資料，共 ${VENUES.length} 處）</b>
+  <div class="card"><b>台中匹克球場地（${VENUES.length} 處）</b>
     <div class="chips" role="group" aria-label="場地類型">${['全部','運動中心','民營球館','戶外與球敘'].map(c=>`<button class="chip" aria-pressed="${S.venue===c}" data-venue="${c}">${c}</button>`).join('')}</div>
-    <div>${vs.map(v=>`<div class="venue"><div class="vt"><b>${v.n}</b><em>${v.a}</em><em>${v.note}</em></div>
-      <div class="vb">${v.tel?`<a class="vbtn" href="tel:${v.tel.replace(/-/g,'')}">撥打 ${v.tel}</a>`:''}${v.url?`<a class="vbtn pri" href="${v.url}" target="_blank" rel="noopener">${/line\.me|lin\.ee/.test(v.url)?'LINE 報名':'線上預約'}</a>`:''}<a class="vbtn" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(v.n)}${v.p?'&query_place_id='+v.p:''}" target="_blank" rel="noopener">地圖</a></div></div>`).join('')}</div>
-    <span class="muted" style="font-size:11.5px">地址與電話已和 Google 地圖、教育部體育署 iplay 場館資訊核對；費用與預約方式整理自各場館公開資訊與 PaddleLab、PicklePi（查詢日 2026/11/13）。費用與時段可能調整，出發前請先向場館確認。</span></div>
+    <div>${(S.vall?vs:vs.slice(0,4)).map(v=>`<div class="venue"><div class="vt"><b>${v.n}</b><em>${v.a.replace(/^臺中市/,'')}</em><em>${v.note}</em></div>
+      <div class="vb">${v.tel?`<a class="vbtn" href="tel:${v.tel.replace(/-/g,'')}" aria-label="撥打 ${v.tel}">電話</a>`:''}${v.url?`<a class="vbtn pri" href="${v.url}" target="_blank" rel="noopener">${/line\.me|lin\.ee/.test(v.url)?'LINE':'預約'}</a>`:''}<a class="vbtn" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(v.n)}${v.p?'&query_place_id='+v.p:''}" target="_blank" rel="noopener">地圖</a></div></div>`).join('')}</div>
+    ${vs.length>4?`<button class="vmore" id="vmore">${S.vall?'收合':`顯示全部 ${vs.length} 處`}</button>`:''}
+    <span class="muted" style="font-size:11px">地址電話核對自 Google 地圖與體育署 iplay（2026/11/13），出發前請先確認。</span></div>
   <div class="card"><b>免費代纏握把布｜30 天退換保證</b><span class="muted">購買後請店員協助，約 3 分鐘；退換條款以百眾公告為準。店內活動：購拍滿一年回收，新拍五折（期限與條件以百眾為準）。</span></div>
   <div class="bubble"><small>LINE 訊息預覽（示意）</small>${S.bought?'<span><b>購買後第 7 天｜</b>握把布用了一週，要不要換新？握把布與配件、場地資訊都在這裡。</span>':'<span><b>第 3 天｜</b>你的處方卡重點：中高階拍彈性 +2、出力輕鬆度 +2。體驗券 7 天內仍可折抵 NT$199，剩 4 天。</span>'}</div>
   <button class="opt" role="checkbox" aria-checked="${S.remind}" id="remind"><span class="dot"></span><span class="t"><b>購買後 7 天提醒握把布；活動延續時，滿 11 個月提醒回購</b><small>可以隨時關閉</small></span></button>
@@ -363,7 +366,8 @@ function bind(){
   const by=$('#buy');if(by)by.onclick=()=>{const t=total();S.bought={code:code(),lines:t.lines,t:t.t};S.declined=false;render();};
   const dc=$('#decline');if(dc)dc.onclick=()=>{S.declined=true;render();};
   const rd=$('#redo');if(rd)rd.onclick=()=>{S.bought=null;S.declined=false;render();};
-  document.querySelectorAll('[data-venue]').forEach(b=>b.onclick=()=>{S.venue=b.dataset.venue;render();});
+  document.querySelectorAll('[data-venue]').forEach(b=>b.onclick=()=>{S.venue=b.dataset.venue;S.vall=false;render();});
+  const vm=$('#vmore');if(vm)vm.onclick=()=>{S.vall=!S.vall;render();};
   const rm=$('#remind');if(rm)rm.onclick=()=>{S.remind=!S.remind;render();};
   const rs=$('#restart');if(rs)rs.onclick=()=>{Object.assign(S,{step:0,slot:null,picks:['a','b','c'],share:false,consent:false,source:null,coupon:null,tested:{a:false,b:false},running:null,prod:'h',old:false,bought:null,venue:'全部',declined:false,own:false,sent:false});render();};
 }
