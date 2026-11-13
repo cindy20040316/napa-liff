@@ -193,7 +193,7 @@ async function sendBooking(){
 const STEPS=[
   {n:'預選預約',staff:'核對預約，只讓顧客試預選的 3 支拍，縮短等待。',data:'LINE 預約表單：記錄預約人數與預約到店率。'},
   {n:'到店領券',staff:'邀請進階測拍，說明 NT$199 可全額折抵。',data:'記錄來源（QR、LINE、Google 地圖、短影音），用於歸因。'},
-  {n:'換拍測拍',staff:'引導手感（初階較硬、中高階較彈），不貶低公用拍，兩次條件相同。',data:'記錄兩次店員評分（1–5 分）與手機錄影；第二階段可接感測或影像分析。'},
+  {n:'換拍測拍',staff:'引導手感（初階較硬、中高階較彈），不貶低公用拍，兩次條件相同。',data:'記錄界內球數與打進後場球數（換算 1–5 分）、顧客自評手感與手機錄影；第二階段可接感測或影像分析。'},
   {n:'處方卡',staff:'解讀卡片，不做健康或療效宣稱。',data:'店員評分帶入處方卡，分享版僅用暱稱並先取得同意。'},
   {n:'促購結帳',staff:'介紹各價位與舊拍折抵，不預設一定要買。',data:'核銷優惠碼，統計成交筆數與折抵金額，並記錄是否為已決定品牌的直接購買者。'},
   {n:'購後服務',staff:'提醒耗材與配件回購，現場代纏握把布。',data:'LINE 回購提醒與滿意度 QR 問卷。'}
@@ -211,7 +211,7 @@ const nameA=()=>S.own?'我的拍子':'初階';
 
 const PICKS=[['a','示意拍 A','偏彈、好上手'],['b','示意拍 B','偏硬、控球型'],['c','示意拍 C','輕量、網前反應快']];
 const SLOTS=['週六 10:00','週六 14:00','週日 10:00','週日 14:00'];
-const MET=[['彈性','分'],['控球','分'],['出力輕鬆度','分']];
+const MET=[['手感（自評，越高越彈）','分'],['控球','分'],['出力輕鬆度','分']];
 const VENUES=[
   {t:'運動中心',n:'臺中市北區國民運動中心',p:'ChIJi1BkR2Q9aTQR3cRtvtaXLU0',a:'臺中市北區崇德路一段55號',tel:'04-22356555',url:'',note:'室內｜每面每小時尖峰 NT$350、離峰 NT$280；只收電話或現場預約'},
   {t:'運動中心',n:'臺中市大里國民暨兒童運動中心',p:'ChIJxzQDPV09aTQRrGbhm5VsCYs',a:'臺中市大里區國光路一段258號',tel:'04-24823900',url:'',note:'室內｜平日離峰每面 NT$280；電話或現場登記'},
@@ -276,7 +276,7 @@ function v1(){
   const run=S.running;
   const done=S.tested.a&&S.tested.b;
   return `<h2>${S.own?'你的拍子和中高階拍各測一次':'初階公用拍和中高階拍各測一次'}</h2>
-  <p class="muted">兩次的試打條件相同（店員餵球或設備），店員逐項評分（1–5 分）。</p>
+  <p class="muted">兩次的試打條件相同（店員餵球或設備），店員計數換算 1–5 分，手感由你自評。</p>
   <div class="row">
     <button class="btn ${S.tested.a?'ghost':''}" id="t-a" ${run||S.tested.a?'disabled':''}>${run==='a'?'測拍中…':S.tested.a?nameA()+' ✓':(S.own?'① 我的拍子':'① 初階公用拍')}</button>
     <button class="btn ${S.tested.b?'ghost':''}" id="t-b" ${run||S.tested.b||!S.tested.a?'disabled':''}>${run==='b'?'測拍中…':S.tested.b?'中高階 ✓':'② 中高階拍'}</button>
@@ -289,7 +289,7 @@ function qr(){const c=[];for(let i=0;i<49;i++){const x=i%7,y=Math.floor(i/7);con
 function v2(){
   const d=i=>SC.b[i]-SC.a[i];
   const sharePart=S.share?`<button class="opt" role="checkbox" aria-checked="${S.consent}" id="consent"><span class="dot"></span><span class="t"><b>我同意用暱稱分享</b><small>不會顯示姓名，可隨時取消</small></span></button>
-    ${S.consent?`<div class="share"><div class="tx"><b>${nick()}的處方卡</b><span class="nums" style="font-size:13px">彈性 +${d(0)}｜控球 +${d(1)}｜輕鬆度 +${d(2)}</span><span>朋友掃碼可領 NT$199 體驗券</span></div>${qr()}</div>
+    ${S.consent?`<div class="share"><div class="tx"><b>${nick()}的處方卡</b><span class="nums" style="font-size:13px">手感偏彈 +${d(0)}｜控球 +${d(1)}｜輕鬆度 +${d(2)}</span><span>朋友掃碼可領 NT$199 體驗券</span></div>${qr()}</div>
     <button class="btn ball" id="lshare">分享給 LINE 好友</button>`:''}`:`<button class="btn ghost" id="share">做成可分享的限動版</button>`;
   const ai=S.rx==='ai';
   const AI=[['發球速度','km/h',32.5,36.4,1],['過網高度','cm',34,21,-1],['界內球數','/10',6,8,1],['落點集中度','分',2,4,1]];
